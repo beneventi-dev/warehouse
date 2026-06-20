@@ -1,11 +1,549 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse</title>
+    <title>Arrastrar 3D</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js">
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #111;
+            overflow: hidden;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            cursor: default;
+        }
+
+        #container.dragging {
+            cursor: grabbing;
+        }
+        #container.pointer {
+            cursor: pointer;
+        }
+
+        .ui {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 20px;
+            border-radius: 6px;
+            color: #888;
+            font-size: 13px;
+            z-index: 10;
+            display: flex;
+            gap: 25px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ui span {
+            color: #fff;
+        }
+
+        .ui .ok {
+            color: #6bcb77;
+        }
+
+        .btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.05);
+            color: #666;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 20;
+            animation: fade 0.3s ease;
+            pointer-events: none;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
-    Warehouse
+
+    <div id="container"></div>
+
+    <div class="ui">
+        <span>📦 <span id="total">2</span></span>
+        <span>➡️ <span class="ok" id="placed">0</span>/2</span>
+    </div>
+
+    <button class="btn" id="reset">↺</button>
+
+    <script>
+        // ============================================================
+        // THREE.JS
+        // ============================================================
+        let scene, camera, renderer, controls;
+        let groupA, groupB;
+        let box1, box2;
+        let placed = 0;
+
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let selected = null;
+        let dragging = false;
+        let offset = new THREE.Vector3();
+
+        // ============================================================
+        // INICIO
+        // ============================================================
+        function init() {
+            const container = document.getElementById('container');
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111122);
+
+            camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 50);
+            camera.position.set(6, 4, 8);
+            camera.lookAt(0, 0.2, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.minDistance = 4;
+            controls.maxDistance = 15;
+            controls.target.set(0, 0.2, 0);
+            controls.update();
+
+            // Luces
+            const ambient = new THREE.AmbientLight(0x404060, 0.6);
+            scene.add(ambient);
+
+            const dir = new THREE.DirectionalLight(0xffeedd, 1);
+            dir.position.set(5, 10, 5);
+            dir.castShadow = true;
+            dir.shadow.mapSize.width = 1024;
+            dir.shadow.mapSize.height = 1024;
+            dir.shadow.camera.near = 0.1;
+            dir.shadow.camera.far = 30;
+            dir.shadow.camera.left = -10;
+            dir.shadow.camera.right = 10;
+            dir.shadow.camera.top = 10;
+            dir.shadow.camera.bottom = -10;
+            scene.add(dir);
+
+            // Piso
+            createFloor();
+
+            // Áreas
+            createAreas();
+
+            // Cajas
+            createBoxes();
+
+            // Eventos
+            container.addEventListener('pointerdown', onDown);
+            container.addEventListener('pointermove', onMove);
+            container.addEventListener('pointerup', onUp);
+            container.addEventListener('pointerleave', onUp);
+
+            window.addEventListener('resize', onResize);
+
+            animate();
+            updateUI();
+
+            console.log('📦 Arrastra caja al área derecha');
+        }
+
+        // ============================================================
+        // SUELO
+        // ============================================================
+        function createFloor() {
+            const grid = new THREE.GridHelper(10, 10, 0x333366, 0x222244);
+            grid.position.y = -0.01;
+            scene.add(grid);
+        }
+
+        // ============================================================
+        // ÁREAS
+        // ============================================================
+        function createAreas() {
+            // Área A (izquierda) - ROJA
+            groupA = new THREE.Group();
+            groupA.position.set(-3, 0, 0);
+            createArea(groupA, 0xff6b6b);
+            scene.add(groupA);
+
+            // Área B (derecha) - AZUL
+            groupB = new THREE.Group();
+            groupB.position.set(3, 0, 0);
+            createArea(groupB, 0x4d96ff);
+            scene.add(groupB);
+        }
+
+        function createArea(group, color) {
+            // Base visible
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.15,
+                roughness: 0.5,
+                metalness: 0.1
+            });
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.02, 2.5), mat);
+            mesh.position.y = 0.01;
+            mesh.receiveShadow = true;
+            group.add(mesh);
+
+            // Borde
+            const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(2.5, 0.02, 2.5));
+            const lineMat = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.3
+            });
+            const line = new THREE.LineSegments(edges, lineMat);
+            line.position.y = 0.02;
+            group.add(line);
+
+            // Etiqueta pequeña
+            const labelMat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.1
+            });
+            const label = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), labelMat);
+            label.position.set(0, 0.5, 0);
+            group.add(label);
+        }
+
+        // ============================================================
+        // CAJAS - DENTRO DE LAS ÁREAS
+        // ============================================================
+        function createBoxes() {
+            // Caja roja en área A
+            box1 = makeBox(0xe94560, new THREE.Vector3(0, 0.3, -0.5));
+            groupA.add(box1);
+
+            // Caja azul en área A
+            box2 = makeBox(0x4d96ff, new THREE.Vector3(0, 0.3, 0.5));
+            groupA.add(box2);
+
+            document.getElementById('total').textContent = 2;
+        }
+
+        function makeBox(color, pos) {
+            const g = new THREE.Group();
+
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.4,
+                metalness: 0.2,
+                emissive: color,
+                emissiveIntensity: 0.05
+            });
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat);
+            body.position.y = 0.25;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            g.add(body);
+
+            const edge = new THREE.Mesh(
+                new THREE.BoxGeometry(0.52, 0.03, 0.52),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.08 })
+            );
+            edge.position.y = 0.5;
+            g.add(edge);
+
+            g.position.copy(pos);
+            g.userData = {
+                isBox: true,
+                origPos: pos.clone(),
+                placed: false,
+                color: color === 0xe94560 ? 'roja' : 'azul'
+            };
+
+            return g;
+        }
+
+        // ============================================================
+        // INTERACCIÓN
+        // ============================================================
+        function onDown(e) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            mouse.set(x, y);
+            raycaster.setFromCamera(mouse, camera);
+
+            const hits = raycaster.intersectObjects(scene.children, true);
+
+            for (let hit of hits) {
+                let obj = hit.object;
+                let box = findBox(obj);
+
+                if (box && !box.userData.placed) {
+                    controls.enabled = false;
+                    selected = box;
+                    dragging = true;
+
+                    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                    const pt = new THREE.Vector3();
+                    raycaster.ray.intersectPlane(plane, pt);
+
+                    if (pt) {
+                        offset.copy(selected.position).sub(pt);
+                    }
+
+                    selected.position.y = 0.6;
+                    document.getElementById('container').classList.add('dragging');
+
+                    // Resaltar
+                    box.children.forEach(c => {
+                        if (c.material) c.material.emissiveIntensity = 0.3;
+                    });
+
+                    showToast(`📦 ${box.userData.color}`);
+                    break;
+                }
+            }
+        }
+
+        function onMove(e) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            mouse.set(x, y);
+
+            if (dragging && selected) {
+                raycaster.setFromCamera(mouse, camera);
+
+                const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                const pt = new THREE.Vector3();
+                raycaster.ray.intersectPlane(plane, pt);
+
+                if (pt) {
+                    const newPos = pt.clone().add(offset);
+                    // Limitar movimiento
+                    newPos.x = Math.max(-5.5, Math.min(5.5, newPos.x));
+                    newPos.z = Math.max(-2, Math.min(2, newPos.z));
+                    newPos.y = 0.6;
+                    selected.position.copy(newPos);
+
+                    // Resaltar área B si está sobre ella
+                    const overB = newPos.x > 1.5 && newPos.x < 4.5 &&
+                        newPos.z > -1.5 && newPos.z < 1.5;
+
+                    groupB.children.forEach(c => {
+                        if (c.material) {
+                            c.material.opacity = overB ? 0.4 : 0.15;
+                        }
+                    });
+                }
+                return;
+            }
+
+            // Hover
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(scene.children, true);
+
+            let found = false;
+            for (let hit of hits) {
+                let box = findBox(hit.object);
+                if (box && !box.userData.placed) {
+                    document.getElementById('container').classList.add('pointer');
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) document.getElementById('container').classList.remove('pointer');
+        }
+
+        function onUp(e) {
+            if (dragging && selected) {
+                const pos = selected.position;
+                const overB = pos.x > 1.5 && pos.x < 4.5 &&
+                    pos.z > -1.5 && pos.z < 1.5;
+
+                if (overB && !selected.userData.placed) {
+                    // Colocar en área B
+                    selected.userData.placed = true;
+                    placed++;
+                    updateUI();
+
+                    // Mover al grupo B
+                    if (selected.parent) {
+                        selected.parent.remove(selected);
+                    }
+                    groupB.add(selected);
+
+                    // Posicionar exactamente en el centro del área B
+                    const targetX = 0;
+                    const targetZ = selected.userData.color === 'roja' ? -0.5 : 0.5;
+                    selected.position.set(targetX, 0.3, targetZ);
+
+                    showToast(`✅ ${selected.userData.color}`);
+
+                    if (placed >= 2) {
+                        setTimeout(() => showToast('🎉 completo'), 400);
+                    }
+                } else if (!overB && !selected.userData.placed) {
+                    // Volver a posición original en área A
+                    selected.position.copy(selected.userData.origPos);
+                } else {
+                    selected.position.y = 0.3;
+                }
+
+                // Reset
+                selected.children.forEach(c => {
+                    if (c.material) c.material.emissiveIntensity = 0.05;
+                });
+
+                selected = null;
+                dragging = false;
+                controls.enabled = true;
+
+                document.getElementById('container').classList.remove('dragging');
+
+                // Reset área B
+                groupB.children.forEach(c => {
+                    if (c.material) c.material.opacity = 0.15;
+                });
+
+                updateUI();
+            }
+        }
+
+        // ============================================================
+        // UTILIDADES
+        // ============================================================
+        function findBox(obj) {
+            while (obj) {
+                if (obj.userData && obj.userData.isBox) return obj;
+                obj = obj.parent;
+            }
+            return null;
+        }
+
+        function updateUI() {
+            document.getElementById('placed').textContent = placed;
+        }
+
+        function showToast(msg) {
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transition = '0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 1000);
+        }
+
+        // ============================================================
+        // REINICIAR
+        // ============================================================
+        function reset() {
+            placed = 0;
+            updateUI();
+
+            [box1, box2].forEach(box => {
+                box.userData.placed = false;
+                if (box.parent) box.parent.remove(box);
+                groupA.add(box);
+                box.position.copy(box.userData.origPos);
+                box.rotation.set(0, 0, 0);
+            });
+
+            showToast('↺');
+        }
+
+        // ============================================================
+        // ANIMACIÓN
+        // ============================================================
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // ============================================================
+        // RESIZE
+        // ============================================================
+        function onResize() {
+            const c = document.getElementById('container');
+            camera.aspect = c.clientWidth / c.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(c.clientWidth, c.clientHeight);
+        }
+
+        // ============================================================
+        // INICIO
+        // ============================================================
+        init();
+
+        document.getElementById('reset').addEventListener('click', reset);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r') reset();
+        });
+    </script>
+
 </body>
 </html>
