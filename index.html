@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚛 Carga Máxima - Control Total</title>
+    <title>🚛 Carga Máxima - Mapa SVG Chile</title>
 
     <style>
+        /* ===== ESTILOS COMPLETOS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -167,6 +168,7 @@
             height: auto;
             display: block;
             min-height: 650px;
+            background: #f7fafc;
         }
 
         /* ===== CAMIÓN EN MOVIMIENTO ===== */
@@ -268,6 +270,7 @@
             transition: width 0.05s linear;
         }
 
+        /* ===== CIUDADES EN EL MAPA ===== */
         .city-dot {
             cursor: pointer;
             transition: all 0.3s;
@@ -309,6 +312,7 @@
             text-anchor: middle;
         }
 
+        /* ===== LEYENDA ===== */
         .legend {
             display: flex;
             gap: 15px;
@@ -775,7 +779,7 @@
         <div class="header">
             <div>
                 <h1>🚛 Carga <span>Máxima</span></h1>
-                <span class="sub">Control Total</span>
+                <span class="sub">Mapa SVG Chile</span>
             </div>
             <div class="player-info">
                 <div class="item">💰 <span class="num gold" id="money">5000</span></div>
@@ -794,141 +798,182 @@
 
         <!-- MAIN -->
         <div class="main-grid">
-            <!-- MAPA -->
+            <!-- MAPA SVG -->
             <div class="map-section">
                 <h2>
-                    🗺️ Rutas de Chile
+                    🗺️ Mapa de Chile
                     <span class="badge-auto">⚡ Generación Automática</span>
                 </h2>
                 <div class="map-container" style="position:relative;" id="mapContainer">
-                    <svg class="map-svg" viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" id="mapSvg">
-                        <!-- CARRETERAS -->
+                    <svg class="map-svg" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg" id="mapSvg">
+                        <!-- ===== CONTORNO DE CHILE ===== -->
+                        <path d="
+                            M280,20 L290,25 L295,35 L290,45 L295,55 L290,65 L285,75 L290,85 L285,95 L290,105 L285,115 L290,125 L285,135 L290,145 L285,155 L290,165 L285,175 L290,185 L285,195 L290,205 L285,215 L290,225 L285,235 L290,245 L285,255 L290,265 L285,275 L290,285 L285,295 L290,305 L285,315 L290,325 L285,335 L290,345 L285,355 L290,365 L285,375 L290,385 L285,395 L290,405 L285,415 L290,425 L285,435 L290,445 L285,455 L290,465 L285,475 L290,485 L285,495 L290,505 L285,515 L290,525 L285,535 L290,545 L285,555 L290,565 L285,575 L290,585 L285,595 L290,605 L285,615 L290,625 L285,635 L290,645 L285,655 L290,665 L285,675 L290,685 L285,695 L290,705 L285,715 L290,725 L295,735 L300,745 L305,735 L310,725 L315,715 L320,705 L325,695 L330,685 L335,675 L330,665 L335,655 L330,645 L335,635 L330,625 L335,615 L330,605 L335,595 L330,585 L335,575 L330,565 L335,555 L330,545 L335,535 L330,525 L335,515 L330,505 L335,495 L330,485 L335,475 L330,465 L335,455 L330,445 L335,435 L330,425 L335,415 L330,405 L335,395 L330,385 L335,375 L330,365 L335,355 L330,345 L335,335 L330,325 L335,315 L330,305 L335,295 L330,285 L335,275 L330,265 L335,255 L330,245 L335,235 L330,225 L335,215 L330,205 L335,195 L330,185 L335,175 L330,165 L335,155 L330,145 L335,135 L330,125 L335,115 L330,105 L335,95 L330,85 L335,75 L330,65 L335,55 L330,45 L325,35 L320,25 L310,20 L300,15 L290,20 Z
+                        " fill="#ffffff" stroke="#2b6cb0" stroke-width="1.5" opacity="0.9"/>
+
+                        <!-- ===== CARRETERAS ===== -->
+                        <!-- Ruta 1: Arica → Iquique -->
                         <g class="road-group">
-                            <path class="road-border main" d="M300,40 L160,120" />
-                            <path class="road-center main" d="M300,40 L160,120" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M160,120 L300,180" />
-                            <path class="road-center main" d="M160,120 L300,180" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border secondary" d="M300,180 L460,160" />
-                            <path class="road-center secondary" d="M300,180 L460,160" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M300,180 L300,240" />
-                            <path class="road-center main" d="M300,180 L300,240" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M300,240 L260,300" />
-                            <path class="road-center main" d="M300,240 L260,300" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border secondary" d="M260,300 L120,300" />
-                            <path class="road-center secondary" d="M260,300 L120,300" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border secondary" d="M260,300 L400,320" />
-                            <path class="road-center secondary" d="M260,300 L400,320" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M400,320 L350,400" />
-                            <path class="road-center main" d="M400,320 L350,400" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border secondary" d="M350,400 L180,400" />
-                            <path class="road-center secondary" d="M350,400 L180,400" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M350,400 L280,440" />
-                            <path class="road-center main" d="M350,400 L280,440" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border secondary" d="M280,440 L180,480" />
-                            <path class="road-center secondary" d="M280,440 L180,480" />
-                        </g>
-                        <g class="road-group">
-                            <path class="road-border main" d="M280,440 L280,520" />
-                            <path class="road-center main" d="M280,440 L280,520" />
+                            <path class="road-border main" d="M300,40 L230,110" />
+                            <path class="road-center main" d="M300,40 L230,110" />
                         </g>
 
-                        <!-- CIUDADES -->
+                        <!-- Ruta 2: Iquique → Antofagasta -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M230,110 L300,180" />
+                            <path class="road-center main" d="M230,110 L300,180" />
+                        </g>
+
+                        <!-- Ruta 3: Antofagasta → Calama -->
+                        <g class="road-group">
+                            <path class="road-border secondary" d="M300,180 L380,160" />
+                            <path class="road-center secondary" d="M300,180 L380,160" />
+                        </g>
+
+                        <!-- Ruta 4: Antofagasta → La Serena -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M300,180 L300,250" />
+                            <path class="road-center main" d="M300,180 L300,250" />
+                        </g>
+
+                        <!-- Ruta 5: La Serena → Santiago -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M300,250 L280,320" />
+                            <path class="road-center main" d="M300,250 L280,320" />
+                        </g>
+
+                        <!-- Ruta 6: Santiago → Valparaíso -->
+                        <g class="road-group">
+                            <path class="road-border secondary" d="M280,320 L200,330" />
+                            <path class="road-center secondary" d="M280,320 L200,330" />
+                        </g>
+
+                        <!-- Ruta 7: Santiago → Rancagua -->
+                        <g class="road-group">
+                            <path class="road-border secondary" d="M280,320 L380,340" />
+                            <path class="road-center secondary" d="M280,320 L380,340" />
+                        </g>
+
+                        <!-- Ruta 8: Rancagua → Los Ángeles -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M380,340 L350,420" />
+                            <path class="road-center main" d="M380,340 L350,420" />
+                        </g>
+
+                        <!-- Ruta 9: Los Ángeles → Concepción -->
+                        <g class="road-group">
+                            <path class="road-border secondary" d="M350,420 L250,430" />
+                            <path class="road-center secondary" d="M350,420 L250,430" />
+                        </g>
+
+                        <!-- Ruta 10: Los Ángeles → Temuco -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M350,420 L300,480" />
+                            <path class="road-center main" d="M350,420 L300,480" />
+                        </g>
+
+                        <!-- Ruta 11: Temuco → Valdivia -->
+                        <g class="road-group">
+                            <path class="road-border secondary" d="M300,480 L240,530" />
+                            <path class="road-center secondary" d="M300,480 L240,530" />
+                        </g>
+
+                        <!-- Ruta 12: Temuco → Puerto Montt -->
+                        <g class="road-group">
+                            <path class="road-border main" d="M300,480 L300,580" />
+                            <path class="road-center main" d="M300,480 L300,580" />
+                        </g>
+
+                        <!-- ===== CIUDADES ===== -->
+                        <!-- Arica -->
                         <g class="city-dot" data-city="arica" onclick="handleCityClick('arica')">
                             <circle cx="300" cy="40" r="14" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="2.5"/>
                             <text x="300" y="62" class="city-label">Arica</text>
                             <text x="300" y="40" class="badge-text" id="badge-arica" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Iquique -->
                         <g class="city-dot" data-city="iquique" onclick="handleCityClick('iquique')">
-                            <circle cx="160" cy="120" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="160" y="142" class="city-label">Iquique</text>
-                            <text x="160" y="120" class="badge-text" id="badge-iquique" fill="#d69e2e"></text>
+                            <circle cx="230" cy="110" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="230" y="132" class="city-label">Iquique</text>
+                            <text x="230" y="110" class="badge-text" id="badge-iquique" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Calama -->
                         <g class="city-dot" data-city="calama" onclick="handleCityClick('calama')">
-                            <circle cx="460" cy="160" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="460" y="182" class="city-label">Calama</text>
-                            <text x="460" y="160" class="badge-text" id="badge-calama" fill="#d69e2e"></text>
+                            <circle cx="380" cy="160" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="380" y="182" class="city-label">Calama</text>
+                            <text x="380" y="160" class="badge-text" id="badge-calama" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Antofagasta -->
                         <g class="city-dot" data-city="antofagasta" onclick="handleCityClick('antofagasta')">
                             <circle cx="300" cy="180" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
                             <text x="300" y="202" class="city-label">Antofagasta</text>
                             <text x="300" y="180" class="badge-text" id="badge-antofagasta" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- La Serena -->
                         <g class="city-dot" data-city="la_serena" onclick="handleCityClick('la_serena')">
-                            <circle cx="300" cy="240" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="300" y="262" class="city-label">La Serena</text>
-                            <text x="300" y="240" class="badge-text" id="badge-la_serena" fill="#d69e2e"></text>
+                            <circle cx="300" cy="250" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="300" y="272" class="city-label">La Serena</text>
+                            <text x="300" y="250" class="badge-text" id="badge-la_serena" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Valparaíso -->
                         <g class="city-dot" data-city="valparaiso" onclick="handleCityClick('valparaiso')">
-                            <circle cx="120" cy="300" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="120" y="322" class="city-label">Valparaíso</text>
-                            <text x="120" y="300" class="badge-text" id="badge-valparaiso" fill="#d69e2e"></text>
+                            <circle cx="200" cy="330" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="200" y="352" class="city-label">Valparaíso</text>
+                            <text x="200" y="330" class="badge-text" id="badge-valparaiso" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Santiago -->
                         <g class="city-dot" data-city="santiago" onclick="handleCityClick('santiago')">
-                            <circle cx="260" cy="300" r="16" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="3"/>
-                            <text x="260" y="325" class="city-label">Santiago</text>
-                            <text x="260" y="300" class="badge-text" id="badge-santiago" fill="#d69e2e"></text>
+                            <circle cx="280" cy="320" r="16" fill="#ebf8ff" stroke="#2b6cb0" stroke-width="3"/>
+                            <text x="280" y="345" class="city-label">Santiago</text>
+                            <text x="280" y="320" class="badge-text" id="badge-santiago" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Rancagua -->
                         <g class="city-dot" data-city="rancagua" onclick="handleCityClick('rancagua')">
-                            <circle cx="400" cy="320" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="400" y="342" class="city-label">Rancagua</text>
-                            <text x="400" y="320" class="badge-text" id="badge-rancagua" fill="#d69e2e"></text>
+                            <circle cx="380" cy="340" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="380" y="362" class="city-label">Rancagua</text>
+                            <text x="380" y="340" class="badge-text" id="badge-rancagua" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Los Ángeles -->
                         <g class="city-dot" data-city="los_angeles" onclick="handleCityClick('los_angeles')">
-                            <circle cx="350" cy="400" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="350" y="422" class="city-label">Los Ángeles</text>
-                            <text x="350" y="400" class="badge-text" id="badge-los_angeles" fill="#d69e2e"></text>
+                            <circle cx="350" cy="420" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="350" y="442" class="city-label">Los Ángeles</text>
+                            <text x="350" y="420" class="badge-text" id="badge-los_angeles" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Concepción -->
                         <g class="city-dot" data-city="concepcion" onclick="handleCityClick('concepcion')">
-                            <circle cx="180" cy="400" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="180" y="422" class="city-label">Concepción</text>
-                            <text x="180" y="400" class="badge-text" id="badge-concepcion" fill="#d69e2e"></text>
+                            <circle cx="250" cy="430" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="250" y="452" class="city-label">Concepción</text>
+                            <text x="250" y="430" class="badge-text" id="badge-concepcion" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Temuco -->
                         <g class="city-dot" data-city="temuco" onclick="handleCityClick('temuco')">
-                            <circle cx="280" cy="440" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="280" y="462" class="city-label">Temuco</text>
-                            <text x="280" y="440" class="badge-text" id="badge-temuco" fill="#d69e2e"></text>
+                            <circle cx="300" cy="480" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="300" y="502" class="city-label">Temuco</text>
+                            <text x="300" y="480" class="badge-text" id="badge-temuco" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Valdivia -->
                         <g class="city-dot" data-city="valdivia" onclick="handleCityClick('valdivia')">
-                            <circle cx="180" cy="480" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="180" y="502" class="city-label">Valdivia</text>
-                            <text x="180" y="480" class="badge-text" id="badge-valdivia" fill="#d69e2e"></text>
+                            <circle cx="240" cy="530" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="240" y="552" class="city-label">Valdivia</text>
+                            <text x="240" y="530" class="badge-text" id="badge-valdivia" fill="#d69e2e"></text>
                         </g>
 
+                        <!-- Puerto Montt -->
                         <g class="city-dot" data-city="puerto_montt" onclick="handleCityClick('puerto_montt')">
-                            <circle cx="280" cy="520" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
-                            <text x="280" y="542" class="city-label">Pto. Montt</text>
-                            <text x="280" y="520" class="badge-text" id="badge-puerto_montt" fill="#d69e2e"></text>
+                            <circle cx="300" cy="580" r="14" fill="#f7fafc" stroke="#cbd5e0" stroke-width="2"/>
+                            <text x="300" y="602" class="city-label">Pto. Montt</text>
+                            <text x="300" y="580" class="badge-text" id="badge-puerto_montt" fill="#d69e2e"></text>
                         </g>
                     </svg>
 
@@ -1054,26 +1099,26 @@
 
     <script>
         // ============================================================
-        // CIUDADES
+        // CIUDADES CON COORDENADAS EN EL MAPA SVG
         // ============================================================
         const CITIES = [
             { id: 'arica', name: 'Arica', x: 300, y: 40 },
-            { id: 'iquique', name: 'Iquique', x: 160, y: 120 },
-            { id: 'calama', name: 'Calama', x: 460, y: 160 },
+            { id: 'iquique', name: 'Iquique', x: 230, y: 110 },
+            { id: 'calama', name: 'Calama', x: 380, y: 160 },
             { id: 'antofagasta', name: 'Antofagasta', x: 300, y: 180 },
-            { id: 'la_serena', name: 'La Serena', x: 300, y: 240 },
-            { id: 'valparaiso', name: 'Valparaíso', x: 120, y: 300 },
-            { id: 'santiago', name: 'Santiago', x: 260, y: 300 },
-            { id: 'rancagua', name: 'Rancagua', x: 400, y: 320 },
-            { id: 'los_angeles', name: 'Los Ángeles', x: 350, y: 400 },
-            { id: 'concepcion', name: 'Concepción', x: 180, y: 400 },
-            { id: 'temuco', name: 'Temuco', x: 280, y: 440 },
-            { id: 'valdivia', name: 'Valdivia', x: 180, y: 480 },
-            { id: 'puerto_montt', name: 'Pto. Montt', x: 280, y: 520 },
+            { id: 'la_serena', name: 'La Serena', x: 300, y: 250 },
+            { id: 'valparaiso', name: 'Valparaíso', x: 200, y: 330 },
+            { id: 'santiago', name: 'Santiago', x: 280, y: 320 },
+            { id: 'rancagua', name: 'Rancagua', x: 380, y: 340 },
+            { id: 'los_angeles', name: 'Los Ángeles', x: 350, y: 420 },
+            { id: 'concepcion', name: 'Concepción', x: 250, y: 430 },
+            { id: 'temuco', name: 'Temuco', x: 300, y: 480 },
+            { id: 'valdivia', name: 'Valdivia', x: 240, y: 530 },
+            { id: 'puerto_montt', name: 'Pto. Montt', x: 300, y: 580 },
         ];
 
         // ============================================================
-        // DISTANCIAS
+        // DISTANCIAS (km) - VALORES REALES
         // ============================================================
         const DISTANCES = {
             'arica-iquique': 305, 'iquique-arica': 305,
@@ -1198,12 +1243,11 @@
         document.getElementById('btnLIFO').addEventListener('click', () => setMethod('lifo'));
 
         // ============================================================
-        // GENERAR ENCOMIENDA AUTOMÁTICA (CORREGIDO)
+        // GENERAR ENCOMIENDA AUTOMÁTICA
         // ============================================================
         function generateAutoOrder() {
             if (state.gameOver || state.isTraveling) return;
 
-            // Asegurar que hay al menos 2 ciudades disponibles
             const available = CITIES.filter(c => c.id !== state.truckPosition);
             if (available.length < 2) return;
 
@@ -1232,10 +1276,9 @@
         }
 
         // ============================================================
-        // AUTO TIMER (CORREGIDO)
+        // AUTO TIMER
         // ============================================================
         function startAutoTimer() {
-            // Limpiar intervalo anterior
             if (state.autoInterval) {
                 clearInterval(state.autoInterval);
                 state.autoInterval = null;
@@ -1243,7 +1286,6 @@
 
             const intervalMs = state.autoSpeed * 1000;
 
-            // Generar ordenes iniciales con retraso para que la UI esté lista
             setTimeout(() => {
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => {
@@ -1254,7 +1296,6 @@
                 }
             }, 300);
 
-            // Configurar intervalo
             state.autoInterval = setInterval(() => {
                 if (state.autoActive && !state.gameOver) {
                     generateAutoOrder();
@@ -1295,7 +1336,7 @@
         // ============================================================
         function updateTruckPosition(x, y) {
             const relX = (x / 600) * 100;
-            const relY = (y / 700) * 100;
+            const relY = (y / 800) * 100;
             truckMoving.style.left = `${relX}%`;
             truckMoving.style.top = `${relY}%`;
             truckMoving.style.display = 'block';
@@ -1446,7 +1487,7 @@
         }
 
         // ============================================================
-        // CARGAR ENCOMIENDA
+        // CARGAR ENCOMIENDA (MANUAL)
         // ============================================================
         function loadOrder(orderId) {
             if (state.gameOver || state.isTraveling) {
@@ -1484,7 +1525,7 @@
         }
 
         // ============================================================
-        // ENTREGAR ENCOMIENDA
+        // ENTREGAR ENCOMIENDA (MANUAL)
         // ============================================================
         function deliverCargo() {
             if (state.isTraveling) {
@@ -1589,7 +1630,7 @@
         }
 
         // ============================================================
-        // RENDER ACCIONES
+        // RENDER ACCIONES DE MI CAMIÓN
         // ============================================================
         function renderTruckActions() {
             const cityName = getCityName(state.truckPosition);
@@ -1678,7 +1719,7 @@
         function renderDispatchGuide() {
             if (state.cargo.length === 0) {
                 dispatchList.innerHTML =
-                `<div class="dispatch-empty">🚛 Sin encomiendas en el camión</div>`;
+                    `<div class="dispatch-empty">🚛 Sin encomiendas en el camión</div>`;
                 return;
             }
 
@@ -1691,7 +1732,9 @@
                 const isNext = index === 0;
                 const orderNum = method === 'fifo' ? index + 1 : cargoCopy.length - index;
 
-                let statusClass = '', statusText = '', itemClass = '';
+                let statusClass = '',
+                    statusText = '',
+                    itemClass = '';
                 if (isNext) {
                     if (method === 'fifo') {
                         statusClass = 'next';
@@ -1735,9 +1778,7 @@
                 }
             });
 
-            // No mostrar camión en la ciudad durante el viaje (se muestra el que se mueve)
             if (!state.isTraveling) {
-                // Mostrar camión en la ciudad actual
                 const cityDot = document.querySelector(`.city-dot[data-city="${state.truckPosition}"] .truck-icon`);
                 if (cityDot) cityDot.textContent = '🚛';
             }
@@ -1949,14 +1990,12 @@
             travelProgress.classList.remove('active');
             travelFill.style.width = '0%';
 
-            // Posicionar camión en Santiago
             const startCoords = getCityCoords('santiago');
             if (startCoords) {
                 updateTruckPosition(startCoords.x, startCoords.y);
                 truckMoving.style.display = 'block';
             }
 
-            // Generar órdenes iniciales
             setTimeout(() => {
                 for (let i = 0; i < 3; i++) {
                     setTimeout(() => generateAutoOrder(), i * 300);
@@ -2018,7 +2057,8 @@
 
         updateUI();
 
-        console.log('🚛 Carga Máxima - Control Total');
+        console.log('🚛 Carga Máxima - Mapa SVG Chile');
+        console.log('🗺️ Mapa con contorno de Chile y ciudades proporcionales');
         console.log('📍 Camión visible al inicio');
         console.log('📦 Órdenes automáticas generándose');
         console.log('📦 Cargar y Entregar son acciones MANUALES');
